@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect
 import dados
 
 biblioteca = dados.carregar_do_arquivo()
@@ -44,3 +44,43 @@ def altera_livro(isbn=None):
            
 if __name__ '_main__':
     app.run()
+
+
+@app.route('/')
+def inicio():
+    return render_template('index.html')
+
+@app.route('/cadastrar', methods=['GET', 'POST'])
+def cadastrar():
+    
+    pass
+
+@app.route('/listar')
+def listar():
+    # código da listagem
+    pass
+
+# COLOQUE A NOVA ROTA AQUI
+@app.route('/atualizar', methods=['GET', 'POST'])
+def atualizar():
+
+    isbn = request.args.get('isbn')
+
+    livro = None
+
+    for item in biblioteca:
+        if item['isbn'] == isbn:
+            livro = item
+            break
+
+    if request.method == 'POST':
+
+        livro['titulo'] = request.form['titulo']
+        livro['autor'] = request.form['autor']
+        livro['ano'] = request.form['ano']
+
+        dados.salvar_no_arquivo(biblioteca)
+
+        return redirect('/listar')
+
+    return render_template('atualizar.html', livro=livro)     
